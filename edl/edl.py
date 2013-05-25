@@ -24,11 +24,14 @@ class List:
 		rep=rep+')'
 		return rep
 
+	def __len__(self):
+		return len(self.events)
+		
 	def append(self,evt):
 		self.events.append(evt)
 		
 	def events(self):
-		pass
+		return self.events
 
 	def without_transitions(self):
 		pass
@@ -70,7 +73,9 @@ class CommentMatcher(Matcher):
 		m=re.search(self.regex,line)
 		if m:
 			stack[-1].comments.append("* "+m.group(1))
-
+			mo=re.search('\*\s+FROM\s+CLIP\s+NAME\:\s+(.+)',line)
+			if mo:
+				stack[-1].clip_name=mo.group(1)
 
 class FallbackMatcher(Matcher):
 	def __init__(self):
@@ -107,7 +112,10 @@ class TimewarpMatcher(Matcher):
 	def apply(self,stack,line):
 		m=re.search(self.regexp,line)
 		if m:
-			stack[-1].timewarp = Timewarp(m.group(1),m.group(2),m.group(3))			
+			stack[-1].timewarp = Timewarp(m.group(1),m.group(2),m.group(3))
+			if float(m.group(2)) < 0:
+				stack[-1].timewarp.reverse=True
+			
 
 class EventMatcher(Matcher):
 	def __init__(self,fps):
@@ -128,6 +136,8 @@ class EventMatcher(Matcher):
 			evt = Event(dict(zip(keys,values)))
 			t=evt.tr_code
 			if t=='C':
+				if len(stack) > 0:
+					stack[-1].next_event=evt
 				evt.transition=Cut()
 			elif t=='D':
 				evt.transition=Dissolve()
@@ -137,6 +147,10 @@ class EventMatcher(Matcher):
 				evt.transition=Key()
 			else:
 				evt.transition=None
+			evt.src_start_tc=pytimecode.PyTimeCode('24',evt.src_start_tc)
+			evt.src_end_tc=pytimecode.PyTimeCode('24',evt.src_end_tc)
+			evt.rec_start_tc=pytimecode.PyTimeCode('24',evt.rec_start_tc)
+			evt.rec_end_tc=pytimecode.PyTimeCode('24',evt.rec_end_tc)
 			stack.append(evt)
 		return evt
 
@@ -165,6 +179,7 @@ class Key(Effect):
 
 class Timewarp:
 	def __init__(self,reel,fps,tc):
+		self.reverse=False
 		self.reel=reel
 		self.fps=float(fps)
 		self.timecode=pytimecode.PyTimeCode(25)
@@ -175,10 +190,13 @@ class Event:
 	def __init__(self,options):
 		"""Initialisation function with options:
 		"""
-		for o in options:
-			self.__dict__[o]=options[o]
 		self.comments=[]
 		self.timewarp=None
+		self.next_event=None
+		self.track=None
+		self.clip_name=None
+		for o in options:
+			self.__dict__[o]=options[o]
 	
 	def __repr__(self):
 		v="(\n"
@@ -190,17 +208,17 @@ class Event:
 	def to_string(self):
 		"""Human Readable string representation of edl event.
 		"""
-		return __repr__(self)
+		return self.__repr__()
 	
 	def to_inspect(self):
 		"""
 			Human Readable string representation of edl event.
 		"""
-		x=x
+		return self.__repr__()
 	
-	def comments(self):
+	def get_comments(self):
 		"""
-			TBC
+			Return comments array
 		"""
 		return self.comments
 	
@@ -208,20 +226,26 @@ class Event:
 		"""
 			TBC
 		"""
-		x=x
+		if self.next_event:
+			return self.next_event.incoming_transition_duration()
+		else:
+			return 0
+
 	
 	def reverse(self):
 		"""
 			Returns true if clip is timewarp reversed
 		"""
-		x=x
+		return (self.timewarp and self.timewarp.reverse)
 	
 	def copy_properties_to(event):
 		"""
 			Copy event properties to another existing event object
 		"""
-		x=x
-	
+		for k in self.__dict__:
+			event.__dict__[k]=self.__dict__[k]
+		return event
+		
 	def has_transition(self):
 		"""
 			Returns true if clip if clip uses a transition and not a Cut
@@ -241,7 +265,10 @@ class Event:
 		"""
 			Returns true if the clip ends with a transition (if the next clip starts with a transition)
 		"""
-		pass
+		if self.next_event:
+			return self.next_event.has_transition()
+		else:
+			return False
 	
 	def has_timewarp(self):
 		"""
@@ -256,41 +283,58 @@ class Event:
 		""" 
 			Returns true if event is black slug
 		"""
-		pass
+		return self.reel=="BL"
 	
 	def rec_length(self):
 		"""
 			Returns record length of event in frames before transition
 		"""
-		x=x
+		return self.rec_end_tc.frames-self.rec_start_tc.frames
 	
 	def rec_length_with_transition(self):
 		"""
 			Returns record length of event in frames including transition
 		"""
-		x=x
+		return self.rec_length()+self.outgoing_transition_duration()
 	
 	def src_length(self):
 		"""
 			Returns source length of event in frames before transition
 		"""
-		x=x
+		return self.src_end_tc.frames-self.src_start_tc.frames
 	
 	def capture_from_tc(self):
-		x=x
+		print "Not yet implemented"
 	
 	def capture_to_and_including_tc(self):
-		x=x
+		print "Not yet implemented"
 	
 	def capture_to_tc(self):
-		x=x
+		print "Not yet implemented"
 	
 	def speed(self):
-		x=x
+		print "Not yet implemented"
 	
 	def generator(self):
-		x=x
+		print "Not yet implemented"
+		
+	def get_clip_name(self):
+		return self.clip_name
 
+	def get_reel(self):
+		return self.reel
+		
+	def event_number(self):
+		return self.num
+		
+	def get_track(self):
+		return self.track
+		
+	def get_tr_code(self):
+		return self.tr_code
+		
+	def get_aux(self):
+		return self.aux
 
 class Parser:
 	default_fps=25.0
@@ -304,6 +348,7 @@ class Parser:
 				TimewarpMatcher(self.fps),CommentMatcher()]
 	
 	def parse(self,input):
+		stack=None
 		if isinstance(input,str):
 			input=input.splitlines(True)
 		if isinstance(input,collections.Iterable):
@@ -319,3 +364,30 @@ if __name__ == '__main__':
 	p=Parser(25)
 	with open('test.edl') as f:
 		s=p.parse(f)
+		evs=s.events
+		for e in evs:
+			print "Event:"+str(e.event_number())
+			print " to_string                  - (ignored)"
+			print " to_inspect                 - (ignored)"
+			print " comments                   - "+str(e.get_comments())
+			print "outgoing_transition_duration- "+str(e.outgoing_transition_duration())
+			print " reverse                    - "+str(e.reverse())
+			print " has_transition             - "+str(e.has_transition())
+			print "incoming_transition_duration- "+str(e.incoming_transition_duration())
+			print " ends_with_transition       - "+str(e.ends_with_transition())
+			print " has_timewarp               - "+str(e.has_timewarp())
+			print " black                      - "+str(e.black())
+			print " rec_length                 - "+str(e.rec_length())
+			print " rec_length_with_transition - "+str(e.rec_length_with_transition())
+			print " src_length                 - "+str(e.src_length())
+			print " capture_from_tc            - "+str(e.capture_from_tc())
+			print " capture_to_and_including_tc- "+str(e.capture_to_and_including_tc())
+			print " capture_to_tc              - "+str(e.capture_to_tc())
+			print " speed                      - "+str(e.speed())
+			print " generator                  - "+str(e.generator())
+			print " clip_name                  - "+str(e.get_clip_name())
+			print " reel                       - "+str(e.get_reel())
+			print " event_number               - "+str(e.event_number())
+			print " track                      - "+str(e.get_track())
+			print " tr_code                    - "+str(e.get_tr_code())
+			print " aux                        - "+str(e.get_aux())
