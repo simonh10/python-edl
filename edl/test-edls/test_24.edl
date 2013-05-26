@@ -1,0 +1,37 @@
+TITLE: Test EDL 24
+
+001  AX       V     C        01:00:00:00 01:00:59:24 00:00:00:00 00:00:59:24
+* FROM CLIP NAME: clip 1
+
+002  AX       AA    C        00:00:00:00 00:01:30:00 00:00:00:00 00:01:30:00
+* FROM CLIP NAME: clip #2
+
+003  AX       V     C        00:00:00:00 00:00:30:01 00:00:59:24 00:01:30:00
+* FROM CLIP NAME: clip -3
+AUD  3    4
+
+004  AX       V     C        00:00:00:00 00:00:24:17 00:01:30:00 00:01:54:17
+* FROM CLIP NAME: clip $4
+
+005  AX       V     C        00:00:00:00 00:00:24:17 00:01:30:00 00:01:54:17
+* FROM CLIP NAME: clip &5
+
+006  AX       AA    C        00:00:29:01 00:00:29:01 00:01:59:01 00:01:59:01
+006  BL       AA    W001 025 00:00:00:00 00:00:10:20 00:01:59:01 00:02:10:21
+EFFECTS NAME IS Constant Power
+* FROM CLIP NAME: Test rename
+* TO CLIP NAME: BL
+
+007  AX       V     C        01:00:00:00 01:00:05:00 00:02:01:10 00:02:06:10
+* FROM CLIP NAME: Black Video
+
+008  AX       V     C        01:00:10:14 01:00:15:00 00:02:06:10 00:02:10:21
+* FROM CLIP NAME: Jellyfish.jpg
+
+009  AX       V     C        00:00:00:00 00:00:30:01 00:02:10:21 00:02:40:22
+* FROM CLIP NAME: Test rename
+M2   AX       -25.0                      00:00:00:00 
+
+010  AX       AA    C        00:00:00:00 00:00:30:01 00:02:10:21 00:02:40:22
+* FROM CLIP NAME: Test rename
+M2   AX       -25.0                      00:00:00:00 

@@ -361,33 +361,4 @@ class Parser:
 		return stack
 		
 if __name__ == '__main__':
-	p=Parser(25)
-	with open('test.edl') as f:
-		s=p.parse(f)
-		evs=s.events
-		for e in evs:
-			print "Event:"+str(e.event_number())
-			print " to_string                  - (ignored)"
-			print " to_inspect                 - (ignored)"
-			print " comments                   - "+str(e.get_comments())
-			print "outgoing_transition_duration- "+str(e.outgoing_transition_duration())
-			print " reverse                    - "+str(e.reverse())
-			print " has_transition             - "+str(e.has_transition())
-			print "incoming_transition_duration- "+str(e.incoming_transition_duration())
-			print " ends_with_transition       - "+str(e.ends_with_transition())
-			print " has_timewarp               - "+str(e.has_timewarp())
-			print " black                      - "+str(e.black())
-			print " rec_length                 - "+str(e.rec_length())
-			print " rec_length_with_transition - "+str(e.rec_length_with_transition())
-			print " src_length                 - "+str(e.src_length())
-			print " capture_from_tc            - "+str(e.capture_from_tc())
-			print " capture_to_and_including_tc- "+str(e.capture_to_and_including_tc())
-			print " capture_to_tc              - "+str(e.capture_to_tc())
-			print " speed                      - "+str(e.speed())
-			print " generator                  - "+str(e.generator())
-			print " clip_name                  - "+str(e.get_clip_name())
-			print " reel                       - "+str(e.get_reel())
-			print " event_number               - "+str(e.event_number())
-			print " track                      - "+str(e.get_track())
-			print " tr_code                    - "+str(e.get_tr_code())
-			print " aux                        - "+str(e.get_aux())
+	pass
