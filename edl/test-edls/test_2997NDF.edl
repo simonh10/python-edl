@@ -1,0 +1,43 @@
+TITLE: Sequence 01
+
+001  AX       V     C        01:00:00:00 01:00:59:24 00:00:00:00 00:00:59:24
+* FROM CLIP NAME: Jellyfish.jpg
+
+002  AX       AA    C        00:00:00:00 00:01:30:00 00:00:00:00 00:01:30:00
+* FROM CLIP NAME: N5_final screensaver_mp4.mov
+
+003  AX       V     C        00:00:00:00 00:00:30:01 00:00:59:24 00:01:30:00
+* FROM CLIP NAME: Test rename
+AUD  3    4
+
+004  AX       V     C        00:00:00:00 00:00:24:17 00:01:30:00 00:01:54:17
+* FROM CLIP NAME: Test rename
+
+005  AX       V     C        00:00:24:17 00:00:24:17 00:01:54:17 00:01:54:17
+005  AX       V     D    070 00:59:58:21 01:00:05:14 00:01:54:17 00:02:01:10
+EFFECTS NAME IS CROSS DISSOLVE
+* FROM CLIP NAME: Test rename
+* TO CLIP NAME: Jellyfish.jpg
+
+006  AX       AA    C        00:00:00:00 00:00:29:01 00:01:30:00 00:01:59:01
+* FROM CLIP NAME: Test rename
+
+007  AX       AA    C        00:00:29:01 00:00:29:01 00:01:59:01 00:01:59:01
+007  BL       AA    W001 025 00:00:00:00 00:00:10:20 00:01:59:01 00:02:10:21
+EFFECTS NAME IS Constant Power
+* FROM CLIP NAME: Test rename
+* TO CLIP NAME: BL
+
+008  AX       V     C        01:00:00:00 01:00:05:00 00:02:01:10 00:02:06:10
+* FROM CLIP NAME: Black Video
+
+009  AX       V     C        01:00:10:14 01:00:15:00 00:02:06:10 00:02:10:21
+* FROM CLIP NAME: Jellyfish.jpg
+
+010  AX       V     C        00:00:00:00 00:00:30:01 00:02:10:21 00:02:40:22
+* FROM CLIP NAME: Test rename
+M2   AX       -25.0                      00:00:00:00 
+
+011  AX       AA    C        00:00:00:00 00:00:30:01 00:02:10:21 00:02:40:22
+* FROM CLIP NAME: Test rename
+M2   AX       -25.0                      00:00:00:00 

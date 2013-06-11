@@ -27,18 +27,20 @@ class TestEDLFunctions(unittest.TestCase):
 			self.assertEqual(s.events[2].clip_name,'clip -3','Failed clip name test char 3')
 			self.assertEqual(s.events[3].clip_name,'clip $4','Failed clip name test char 4')
 			self.assertEqual(s.events[4].clip_name,'clip &5','Failed clip name test char 5')
-			self.assertEqual(s.events[5].src_start_tc.frames,0,"Wrong Source start complex event")
-			self.assertEqual(s.events[5].src_end_tc.frames,242,"Wrong Source end complex event")
+			self.assertEqual(s.events[5].src_start_tc.frames,697,"Wrong Source start complex event")
+			self.assertEqual(s.events[5].src_end_tc.frames,697,"Wrong Source end complex event")
+			self.assertEqual(s.events[5].rec_start_tc.frames,2857,"Wrong Source start complex event")
+			self.assertEqual(s.events[5].rec_end_tc.frames,2857,"Wrong Source end complex event")
 			
 	
 	def test_pal(self):
 		p=edl.Parser('25')
-		with open('test-edls/test_pal.edl') as f:
+		with open('test-edls/test_25.edl') as f:
 			s=p.parse(f)
 	
 	def test_ntsc(self):
 		p=edl.Parser('29.97')
-		with open('test-edls/test_ntsc.edl') as f:
+		with open('test-edls/test_2997NDF.edl') as f:
 			s=p.parse(f)
 
 	def test_2398fps(self):
