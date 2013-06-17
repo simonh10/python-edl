@@ -87,7 +87,7 @@ class FallbackMatcher(Matcher):
 
 class NameMatcher(Matcher):
 	def __init__(self):
-		Matcher.__init__(self,'\* FROM CLIP NAME:(\s+)(.+)')
+		Matcher.__init__(self,'\*\s?FROM CLIP NAME:(\s+)(.+)')
 
 	def apply(self,stack,line):
 		m=re.search(self.regex,line)
