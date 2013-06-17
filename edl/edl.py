@@ -27,6 +27,29 @@ class List:
 	def __len__(self):
 		return len(self.events)
 		
+	def get_start(self):
+		start_tc=None
+		for e in self.events:
+			if start_tc==None:
+				start_tc=e.rec_start_tc
+			else:
+				if e.rec_start_tc < start_tc:
+					start_tc=e.rec_start_tc
+		return start_tc
+		
+	def get_end(self):
+		end_tc=None
+		for e in self.events:
+			if end_tc==None:
+				end_tc=e.rec_end_tc
+			else:
+				if e.rec_end_tc > end_tc:
+					end_tc=e.rec_end_tc
+		return end_tc
+		
+	def get_length(self):
+		return self.get_end().frames-self.get_start().frames
+		
 	def append(self,evt):
 		self.events.append(evt)
 		
