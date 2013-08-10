@@ -89,16 +89,18 @@ class Matcher:
 
 		
 class CommentMatcher(Matcher):
-	def __init__(self):
-		Matcher.__init__(self,'\* (.+)')
+    def __init__(self):
+        Matcher.__init__(self,'\*\s*(.+)')
 
-	def apply(self,stack,line):
-		m=re.search(self.regex,line)
-		if m:
-			stack[-1].comments.append("* "+m.group(1))
-			mo=re.search('\*\s+FROM\s+CLIP\s+NAME\:\s+(.+)',line)
-			if mo:
-				stack[-1].clip_name=mo.group(1)
+    def apply(self,stack,line):
+        #print line
+        m=re.search(self.regex,line)
+        if m:
+            if len(stack)>0:
+                stack[-1].comments.append("* "+m.group(1))
+                mo=re.search('\*\s+FROM\s+CLIP\s+NAME\:\s+(.+)',line)
+                if mo:
+                    stack[-1].clip_name=mo.group(1)
 
 class FallbackMatcher(Matcher):
 	def __init__(self):
@@ -109,13 +111,26 @@ class FallbackMatcher(Matcher):
 
 
 class NameMatcher(Matcher):
-	def __init__(self):
-		Matcher.__init__(self,'\*\s?FROM CLIP NAME:(\s+)(.+)')
+    def __init__(self):
+        Matcher.__init__(self,'\*\s*FROM CLIP NAME:(\s+)(.+)')
 
-	def apply(self,stack,line):
-		m=re.search(self.regex,line)
-		if m:
-			stack[-1].clip_name = m.group(2)
+    def apply(self,stack,line):
+        m=re.search(self.regex,line)
+        #print line
+        if len(stack)>0:
+            if m:
+                stack[-1].clip_name = m.group(2)
+
+class SourceMatcher(Matcher):
+    def __init__(self):
+        Matcher.__init__(self,'\*\s*SOURCE FILE:(\s+)(.+)')
+
+    def apply(self,stack,line):
+        m=re.search(self.regex,line)
+        #print line
+        if len(stack)>0:
+            if m:
+                stack[-1].source_file = m.group(2)
 
 
 class EffectMatcher(Matcher):
@@ -218,6 +233,7 @@ class Event:
 		self.next_event=None
 		self.track=None
 		self.clip_name=None
+		self.source_file=None
 		for o in options:
 			self.__dict__[o]=options[o]
 	
@@ -254,7 +270,6 @@ class Event:
 		else:
 			return 0
 
-	
 	def reverse(self):
 		"""
 			Returns true if clip is timewarp reversed
@@ -367,7 +382,7 @@ class Parser:
 		self.fps=fps
 
 	def get_matchers(self):
-		return [EventMatcher(self.fps), EffectMatcher(), NameMatcher(),
+		return [EventMatcher(self.fps), EffectMatcher(), NameMatcher(), SourceMatcher(),
 				TimewarpMatcher(self.fps),CommentMatcher()]
 	
 	def parse(self,input):
