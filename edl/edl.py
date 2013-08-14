@@ -143,54 +143,56 @@ class EffectMatcher(Matcher):
 			stack[-1].transition.effect = m.group(1)
 
 class TimewarpMatcher(Matcher):
-	def __init__(self,fps):
-		self.fps=fps
-		self.regexp = 'M2\s+(\w+)\s+(\-?\d+\.\d+)\s+(\d{1,2}:\d{1,2}:\d{1,2}[\:\;]\d{1,3})'
-	
-	def apply(self,stack,line):
-		m=re.search(self.regexp,line)
-		if m:
-			stack[-1].timewarp = Timewarp(m.group(1),m.group(2),m.group(3))
-			if float(m.group(2)) < 0:
-				stack[-1].timewarp.reverse=True
+    def __init__(self,fps):
+        self.fps=fps
+        self.regexp = 'M2\s+(\w+)\s+(\-*\d+\.\d+)\s+(\d+:\d+:\d+[\:\;]\d+)'
+        #self.regexp = 'M2\s+(\S+)\s+(\S+)\s+(\S+)'
+        Matcher.__init__(self,self.regexp)
+
+    def apply(self,stack,line):
+        m=re.search(self.regexp,line)
+        if m:
+            stack[-1].timewarp = Timewarp(m.group(1),m.group(2),m.group(3),self.fps)
+            if float(m.group(2)) < 0:
+                stack[-1].timewarp.reverse=True
 			
 
 class EventMatcher(Matcher):
-	def __init__(self,fps):
-		self.fps=fps
-		#self.regexp =re.compile('(\d+)\s+(\w+)\s+(\w+)\s+(\w+)\s+')
-		self.regexp =re.compile(r"(\d+)\s+(\w+)\s+(\w+)\s+(\w+)\s+(\w*)\s+(\d{1,2}:\d{1,2}:\d{1,2}[\:\;]\d{1,3})\s+(\d{1,2}:\d{1,2}:\d{1,2}[\:\;]\d{1,3})\s+(\d{1,2}:\d{1,2}:\d{1,2}[\:\;]\d{1,3})\s+(\d{1,2}:\d{1,2}:\d{1,2}[\:\;]\d{1,3})")
+    def __init__(self,fps):
+        self.fps=fps
+        #self.regexp =re.compile('(\d+)\s+(\w+)\s+(\w+)\s+(\w+)\s+')
+        self.regexp =re.compile(r"(\d+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S*)\s+(\d{1,2}:\d{1,2}:\d{1,2}[\:\;]\d{1,3})\s+(\d{1,2}:\d{1,2}:\d{1,2}[\:\;]\d{1,3})\s+(\d{1,2}:\d{1,2}:\d{1,2}[\:\;]\d{1,3})\s+(\d{1,2}:\d{1,2}:\d{1,2}[\:\;]\d{1,3})")
 
-	def stripper(self,instring):
-		return instring.strip()
+    def stripper(self,instring):
+        return instring.strip()
 
-	def apply(self,stack,line):
-		evt=None
-		m=re.search(self.regexp,line.strip())
-		if m:
-			matches=m.groups()
-			keys = ['num','reel','track','tr_code','aux','src_start_tc','src_end_tc','rec_start_tc','rec_end_tc']
-			values = map(self.stripper,matches)
-			evt = Event(dict(zip(keys,values)))
-			t=evt.tr_code
-			if t=='C':
-				if len(stack) > 0:
-					stack[-1].next_event=evt
-				evt.transition=Cut()
-			elif t=='D':
-				evt.transition=Dissolve()
-			elif re.match('W\d+',t):
-				evt.transition=Wipe()
-			elif t=='K':
-				evt.transition=Key()
-			else:
-				evt.transition=None
-			evt.src_start_tc=pytimecode.PyTimeCode('24',evt.src_start_tc)
-			evt.src_end_tc=pytimecode.PyTimeCode('24',evt.src_end_tc)
-			evt.rec_start_tc=pytimecode.PyTimeCode('24',evt.rec_start_tc)
-			evt.rec_end_tc=pytimecode.PyTimeCode('24',evt.rec_end_tc)
-			stack.append(evt)
-		return evt
+    def apply(self,stack,line):
+        evt=None
+        m=re.search(self.regexp,line.strip())
+        if m:
+            matches=m.groups()
+            keys = ['num','reel','track','tr_code','aux','src_start_tc','src_end_tc','rec_start_tc','rec_end_tc']
+            values = map(self.stripper,matches)
+            evt = Event(dict(zip(keys,values)))
+            t=evt.tr_code
+            if t=='C':
+                if len(stack) > 0:
+                    stack[-1].next_event=evt
+                evt.transition=Cut()
+            elif t=='D':
+                evt.transition=Dissolve()
+            elif re.match('W\d+',t):
+                evt.transition=Wipe()
+            elif t=='K':
+                evt.transition=Key()
+            else:
+                evt.transition=None
+            evt.src_start_tc=pytimecode.PyTimeCode(self.fps,evt.src_start_tc)
+            evt.src_end_tc=pytimecode.PyTimeCode(self.fps,evt.src_end_tc)
+            evt.rec_start_tc=pytimecode.PyTimeCode(self.fps,evt.rec_start_tc)
+            evt.rec_end_tc=pytimecode.PyTimeCode(self.fps,evt.rec_end_tc)
+            stack.append(evt)
+        return evt
 
 class Effect:
 	def __init__(self):
@@ -209,20 +211,20 @@ class Wipe(Effect):
 class Dissolve(Effect):
 	def __init__(self):
 		Effect.__init__(self)
-		
-		
+
 class Key(Effect):
 	def __init__(self):
 		Effect.__init__(self)
 
 class Timewarp:
-	def __init__(self,reel,fps,tc):
-		self.reverse=False
-		self.reel=reel
-		self.fps=float(fps)
-		self.timecode=pytimecode.PyTimeCode(25)
-		self.timecode.set_timecode(tc)
-	
+    def __init__(self,reel,warp_fps,tc,fps):
+        self.reverse=False
+        self.reel=reel
+        self.fps=fps
+        self.warp_fps=float(warp_fps)
+        self.timecode=pytimecode.PyTimeCode(fps)
+        self.timecode.set_timecode(tc)
+
 class Event:
 	"""Represents an edit event (or, more specifically, an EDL line denoting a clip being part of an EDL event)"""
 	def __init__(self,options):

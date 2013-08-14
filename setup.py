@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name='edl',
-    version='0.1.4',
+    version='0.1.5',
     description='Simple EDL reading library',
     author='Simon Hargreaves',
     author_email='simon@simon-hargreaves.com',
