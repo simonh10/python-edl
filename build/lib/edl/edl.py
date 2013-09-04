@@ -19,7 +19,7 @@ class List:
 		
 	def __repr__(self):
 		rep="event(\n"
-		for e in events:
+		for e in self.events:
 			rep=rep+e.__repr__()
 		rep=rep+')'
 		return rep
@@ -33,7 +33,7 @@ class List:
 			if start_tc==None:
 				start_tc=e.rec_start_tc
 			else:
-				if e.rec_start_tc < start_tc:
+				if e.rec_start_tc.frames < start_tc.frames:
 					start_tc=e.rec_start_tc
 		return start_tc
 		
@@ -43,7 +43,7 @@ class List:
 			if end_tc==None:
 				end_tc=e.rec_end_tc
 			else:
-				if e.rec_end_tc > end_tc:
+				if e.rec_end_tc.frames > end_tc.frames:
 					end_tc=e.rec_end_tc
 		return end_tc
 		
@@ -96,7 +96,7 @@ class CommentMatcher(Matcher):
         #print line
         m=re.search(self.regex,line)
         if m:
-            if len(stack)>0:
+            if len(stack)>1:
                 stack[-1].comments.append("* "+m.group(1))
                 mo=re.search('\*\s+FROM\s+CLIP\s+NAME\:\s+(.+)',line)
                 if mo:
