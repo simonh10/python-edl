@@ -96,7 +96,7 @@ class CommentMatcher(Matcher):
         #print line
         m=re.search(self.regex,line)
         if m:
-            if len(stack)>1:
+            if len(stack)>0:
                 stack[-1].comments.append("* "+m.group(1))
                 mo=re.search('\*\s+FROM\s+CLIP\s+NAME\:\s+(.+)',line)
                 if mo:
