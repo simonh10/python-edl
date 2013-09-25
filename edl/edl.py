@@ -100,7 +100,7 @@ class CommentMatcher(Matcher):
                 stack[-1].comments.append("* "+m.group(1))
                 mo=re.search('\*\s+FROM\s+CLIP\s+NAME\:\s+(.+)',line)
                 if mo:
-                    stack[-1].clip_name=mo.group(1)
+                    stack[-1].clip_name=mo.group(1).strip()
 
 class FallbackMatcher(Matcher):
 	def __init__(self):
@@ -119,7 +119,7 @@ class NameMatcher(Matcher):
         #print line
         if len(stack)>0:
             if m:
-                stack[-1].clip_name = m.group(2)
+                stack[-1].clip_name = m.group(2).strip()
 
 class SourceMatcher(Matcher):
     def __init__(self):
@@ -130,7 +130,7 @@ class SourceMatcher(Matcher):
         #print line
         if len(stack)>0:
             if m:
-                stack[-1].source_file = m.group(2)
+                stack[-1].source_file = m.group(2).strip()
 
 
 class EffectMatcher(Matcher):
@@ -140,7 +140,7 @@ class EffectMatcher(Matcher):
 	def apply(self,stack,line):
 		m=re.search(self.regex,line)
 		if m:
-			stack[-1].transition.effect = m.group(1)
+			stack[-1].transition.effect = m.group(1).strip()
 
 class TimewarpMatcher(Matcher):
     def __init__(self,fps):
