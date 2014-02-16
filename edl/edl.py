@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#-*- coding: utf-8 -*-
 """
 Module EDL
 """
@@ -11,6 +11,9 @@ import pytimecode
 
 
 class List(object):
+    """No documentation for this class yet.
+    """
+
     def __init__(self, fps):
         self.events = []
         self.fps = fps
@@ -19,11 +22,11 @@ class List(object):
         return self.events[i]
 
     def __repr__(self):
-        rep = "event(\n"
+        rep = ["event(\n"]
         for e in self.events:
-            rep = rep + e.__repr__()
-        rep = rep + ')'
-        return rep
+            rep.append(e.__repr__())
+        rep.append(')')
+        return ''.join(rep)
 
     def __len__(self):
         return len(self.events)
@@ -31,7 +34,7 @@ class List(object):
     def get_start(self):
         start_tc = None
         for e in self.events:
-            if start_tc == None:
+            if start_tc is None:
                 start_tc = e.rec_start_tc
             else:
                 if e.rec_start_tc.frames < start_tc.frames:
@@ -41,7 +44,7 @@ class List(object):
     def get_end(self):
         end_tc = None
         for e in self.events:
-            if end_tc == None:
+            if end_tc is None:
                 end_tc = e.rec_end_tc
             else:
                 if e.rec_end_tc.frames > end_tc.frames:
@@ -80,6 +83,9 @@ class List(object):
 
 
 class Matcher(object):
+    """No documentation for this class yet.
+    """
+
     def __init__(self, with_regex):
         self.regex = with_regex
 
@@ -91,6 +97,9 @@ class Matcher(object):
 
 
 class CommentMatcher(Matcher):
+    """No documentation for this class yet.
+    """
+
     def __init__(self):
         Matcher.__init__(self, '\*\s*(.+)')
 
@@ -100,12 +109,15 @@ class CommentMatcher(Matcher):
         if m:
             if len(stack) > 0:
                 stack[-1].comments.append("* " + m.group(1))
-                mo = re.search('\*\s+FROM\s+CLIP\s+NAME\:\s+(.+)', line)
+                mo = re.search('\*\s+FROM\s+CLIP\s+NAME:\s+(.+)', line)
                 if mo:
                     stack[-1].clip_name = mo.group(1).strip()
 
 
 class FallbackMatcher(Matcher):
+    """No documentation for this class yet.
+    """
+
     def __init__(self):
         Matcher.__init__(self, '/^(\w)(.+)/')
 
@@ -114,6 +126,9 @@ class FallbackMatcher(Matcher):
 
 
 class NameMatcher(Matcher):
+    """No documentation for this class yet.
+    """
+
     def __init__(self):
         Matcher.__init__(self, '\*\s*FROM CLIP NAME:(\s+)(.+)')
 
@@ -126,6 +141,9 @@ class NameMatcher(Matcher):
 
 
 class SourceMatcher(Matcher):
+    """No documentation for this class yet.
+    """
+
     def __init__(self):
         Matcher.__init__(self, '\*\s*SOURCE FILE:(\s+)(.+)')
 
@@ -138,6 +156,9 @@ class SourceMatcher(Matcher):
 
 
 class EffectMatcher(Matcher):
+    """No documentation for this class yet.
+    """
+
     def __init__(self):
         Matcher.__init__(self, 'EFFECTS NAME IS(\s+)(.+)')
 
@@ -148,6 +169,9 @@ class EffectMatcher(Matcher):
 
 
 class TimewarpMatcher(Matcher):
+    """No documentation for this class yet.
+    """
+
     def __init__(self, fps):
         self.fps = fps
         self.regexp = 'M2\s+(\w+)\s+(\-*\d+\.\d+)\s+(\d+:\d+:\d+[\:\;]\d+)'
@@ -164,18 +188,25 @@ class TimewarpMatcher(Matcher):
 
 
 class EventMatcher(Matcher):
-    def __init__(self, fps):
-        self.fps = fps
-        #self.regexp =re.compile('(\d+)\s+(\w+)\s+(\w+)\s+(\w+)\s+')
-        self.regexp = re.compile(
-            r"(\d+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S*)\s+(\d{1,2}:\d{1,2}:\d{1,2}[\:\;]\d{1,3})\s+(\d{1,2}:\d{1,2}:\d{1,2}[\:\;]\d{1,3})\s+(\d{1,2}:\d{1,2}:\d{1,2}[\:\;]\d{1,3})\s+(\d{1,2}:\d{1,2}:\d{1,2}[\:\;]\d{1,3})")
+    """No documentation for this class yet.
+    """
 
-    def stripper(self, instring):
-        return instring.strip()
+    def __init__(self, fps):
+        regexp = re.compile(
+            r"(\d+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S*)\s+(\d{1,2}:\d{1,2}:\d{1,2}"
+            r"[:;]\d{1,3})\s+(\d{1,2}:\d{1,2}:\d{1,2}[:;]\d{1,3})\s+(\d{1,2}:"
+            r"\d{1,2}:\d{1,2}[:;]\d{1,3})\s+(\d{1,2}:\d{1,2}:\d{1,2}[:;]"
+            r"\d{1,3})")
+        Matcher.__init__(self, regexp)
+        self.fps = fps
+
+    @classmethod
+    def stripper(cls, in_string):
+        return in_string.strip()
 
     def apply(self, stack, line):
         evt = None
-        m = re.search(self.regexp, line.strip())
+        m = re.search(self.regex, line.strip())
         if m:
             matches = m.groups()
             keys = ['num', 'reel', 'track', 'tr_code', 'aux', 'src_start_tc',
@@ -206,31 +237,49 @@ class EventMatcher(Matcher):
 
 
 class Effect:
+    """No documentation for this class yet.
+    """
+
     def __init__(self):
         pass
 
 
 class Cut(Effect):
+    """No documentation for this class yet.
+    """
+
     def __init__(self):
         Effect.__init__(self)
 
 
 class Wipe(Effect):
+    """No documentation for this class yet.
+    """
+
     def __init__(self):
         Effect.__init__(self)
 
 
 class Dissolve(Effect):
+    """No documentation for this class yet.
+    """
+
     def __init__(self):
         Effect.__init__(self)
 
 
 class Key(Effect):
+    """No documentation for this class yet.
+    """
+
     def __init__(self):
         Effect.__init__(self)
 
 
 class Timewarp:
+    """No documentation for this class yet.
+    """
+
     def __init__(self, reel, warp_fps, tc, fps):
         self.reverse = False
         self.reel = reel
@@ -240,8 +289,10 @@ class Timewarp:
         self.timecode.set_timecode(tc)
 
 
-class Event:
-    """Represents an edit event (or, more specifically, an EDL line denoting a clip being part of an EDL event)"""
+class Event(object):
+    """Represents an edit event (or, more specifically, an EDL line denoting a
+    clip being part of an EDL event)
+    """
 
     def __init__(self, options):
         """Initialisation function with options:
@@ -252,15 +303,25 @@ class Event:
         self.track = None
         self.clip_name = None
         self.source_file = None
+        self.transition = None
+        self.aux = None
+        self.reel = None
+        self.rec_end_tc = None
+        self.rec_start_tc = None
+        self.src_end_tc = None
+        self.src_start_tc = None
+        self.num = None
+        self.tr_code = None
+
         for o in options:
             self.__dict__[o] = options[o]
 
     def __repr__(self):
-        v = "(\n"
+        v = ["(\n"]
         for k in self.__dict__:
-            v = v + "    " + k + "=" + str(self.__dict__[k]) + ",\n"
-        v = v + ")"
-        return v
+            v.append("    %s=%s,\n" % (k, self.__dict__[k]))
+        v.append(")")
+        return ''.join(v)
 
     def to_string(self):
         """Human Readable string representation of edl event.
@@ -268,20 +329,17 @@ class Event:
         return self.__repr__()
 
     def to_inspect(self):
-        """
-            Human Readable string representation of edl event.
+        """Human Readable string representation of edl event.
         """
         return self.__repr__()
 
     def get_comments(self):
-        """
-            Return comments array
+        """Return comments array
         """
         return self.comments
 
     def outgoing_transition_duration(self):
-        """
-            TBC
+        """TBC
         """
         if self.next_event:
             return self.next_event.incoming_transition_duration()
@@ -289,28 +347,25 @@ class Event:
             return 0
 
     def reverse(self):
+        """Returns true if clip is timewarp reversed
         """
-            Returns true if clip is timewarp reversed
-        """
-        return (self.timewarp and self.timewarp.reverse)
+        return self.timewarp and self.timewarp.reverse
 
-    def copy_properties_to(event):
-        """
-            Copy event properties to another existing event object
+    def copy_properties_to(self, event):
+        """Copy event properties to another existing event object
         """
         for k in self.__dict__:
             event.__dict__[k] = self.__dict__[k]
         return event
 
     def has_transition(self):
-        """
-            Returns true if clip if clip uses a transition and not a Cut
+        """Returns true if clip if clip uses a transition and not a Cut
         """
         return not isinstance(self.transition, Cut)
 
     def incoming_transition_duration(self):
-        """
-            Returns incoming transition duration in frames, returns 0 if no transition set 
+        """Returns incoming transition duration in frames, returns 0 if no
+        transition set
         """
         d = 0
         if not isinstance(self.transition, Cut):
@@ -318,8 +373,8 @@ class Event:
         return d
 
     def ends_with_transition(self):
-        """
-            Returns true if the clip ends with a transition (if the next clip starts with a transition)
+        """Returns true if the clip ends with a transition (if the next clip
+        starts with a transition)
         """
         if self.next_event:
             return self.next_event.has_transition()
@@ -327,8 +382,8 @@ class Event:
             return False
 
     def has_timewarp(self):
-        """
-            Returns true if the clip has a timewarp (speed ramp, motion memory, you name it)
+        """Returns true if the clip has a timewarp (speed ramp, motion memory,
+        you name it)
         """
         if isinstance(self.timewarp, Timewarp):
             return True
@@ -336,43 +391,39 @@ class Event:
             return False
 
     def black(self):
-        """ 
-            Returns true if event is black slug
+        """Returns true if event is black slug
         """
         return self.reel == "BL"
 
     def rec_length(self):
-        """
-            Returns record length of event in frames before transition
+        """Returns record length of event in frames before transition
         """
         return self.rec_end_tc.frames - self.rec_start_tc.frames
 
     def rec_length_with_transition(self):
-        """
-            Returns record length of event in frames including transition
+        """Returns record length of event in frames including transition
         """
         return self.rec_length() + self.outgoing_transition_duration()
 
     def src_length(self):
-        """
-            Returns source length of event in frames before transition
+        """Returns source length of event in frames before transition
         """
         return self.src_end_tc.frames - self.src_start_tc.frames
 
     def capture_from_tc(self):
-        print "Not yet implemented"
+        raise NotImplementedError
 
     def capture_to_and_including_tc(self):
-        print "Not yet implemented"
+        raise NotImplementedError
 
     def capture_to_tc(self):
-        print "Not yet implemented"
+        raise NotImplementedError
 
     def speed(self):
-        print "Not yet implemented"
+        raise NotImplementedError
 
     def generator(self):
-        print "Not yet implemented"
+        raise NotImplementedError
 
     def get_clip_name(self):
         return self.clip_name
@@ -393,12 +444,15 @@ class Event:
         return self.aux
 
 
-class Parser:
+class Parser(object):
+    """No documentation for this class yet.
+    """
+
     default_fps = 25.0
 
     def __init__(self, fps):
         if fps is None:
-            self.fps = default_fps
+            self.fps = self.default_fps
         self.fps = fps
 
     def get_matchers(self):
@@ -406,19 +460,14 @@ class Parser:
                 SourceMatcher(),
                 TimewarpMatcher(self.fps), CommentMatcher()]
 
-    def parse(self, input):
+    def parse(self, input_):
         stack = None
-        if isinstance(input, str):
-            input = input.splitlines(True)
-        if isinstance(input, collections.Iterable):
+        if isinstance(input_, str):
+            input_ = input_.splitlines(True)
+        if isinstance(input_, collections.Iterable):
             stack = List(self.fps)
-            for l in input:
+            for l in input_:
                 for m in self.get_matchers():
                     m.apply(stack, l)
-        pp = pprint.PrettyPrinter(indent=4)
-        #pp.pprint(stack.events)
+        pprint.PrettyPrinter(indent=4)
         return stack
-
-
-if __name__ == '__main__':
-    pass
