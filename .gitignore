@@ -1,6 +1,8 @@
 *~*
 *.swp
 *.pyc
+build/*
+dist/*
 docs/html/*
 docs/latex/*
 docs/doctrees/*
