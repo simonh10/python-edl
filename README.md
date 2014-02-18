@@ -25,10 +25,8 @@ Accepted framerate values ['60', '59.94', '50', '30', '29.97', '25', '24',
 '23.98'] whole number frame rates are more tested than others, but the accuracy
 relies heavily on accuracy of the pytimecode library.
 
-Documentation for pytimecode can be found `here_`
-
-`here`_ :: https://code.google.com/p/pytimecode/
-
+Documentation for pytimecode can be found
+[here](https://code.google.com/p/pytimecode/).
 
 (The MIT License)
 

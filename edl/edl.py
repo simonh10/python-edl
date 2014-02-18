@@ -16,7 +16,7 @@ class List(object):
     Holds :class:`.Event` instances. It can be indexed to reach each of the
     :class:`.Event`\ s like::
 
-      >>> l = List(25)
+      >>> l = List('25')
       >>> l.append(Event())
       >>> l[0]
       <edl.edl.Event object at 0x7fb630564490>
