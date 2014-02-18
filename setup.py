@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
+import edl
 
 setup(
     name='edl',
-    version='0.1.8',
+    version=edl.__version__,
     description='Simple EDL reading library',
     author='Simon Hargreaves',
     author_email='simon@simon-hargreaves.com',
@@ -22,4 +23,5 @@ setup(
        'Natural Language :: English',
        'Topic :: Multimedia :: Video',
        'Topic :: Software Development :: Libraries'
-		])
+    ]
+)
