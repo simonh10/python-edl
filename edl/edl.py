@@ -11,7 +11,19 @@ import pytimecode
 
 
 class List(object):
-    """No documentation for this class yet.
+    """The EDL it self.
+
+    Holds :class:`.Event` instances. It can be indexed to reach each of the
+    :class:`.Event`\ s like::
+
+      >>> l = List(25)
+      >>> l.append(Event())
+      >>> l[0]
+      <edl.edl.Event object at 0x7fb630564490>
+
+    :param str fps: The frame per second setting for for this EDL. Should be a
+      string one of ['23.98', '24', '25', '29.97', '30', '50', '59.94', '60'].
+      `fps` can not be skipped.
     """
 
     def __init__(self, fps):
@@ -19,14 +31,16 @@ class List(object):
         self.fps = fps
 
     def __getitem__(self, i):
+        """Returns each of the Events that this List holds.
+        """
         return self.events[i]
 
-    def __repr__(self):
-        rep = ["event(\n"]
-        for e in self.events:
-            rep.append(e.__repr__())
-        rep.append(')')
-        return ''.join(rep)
+    # def __repr__(self):
+    #     rep = ["event(\n"]
+    #     for e in self.events:
+    #         rep.append(e.__repr__())
+    #     rep.append(')')
+    #     return ''.join(rep)
 
     def __len__(self):
         return len(self.events)
@@ -130,6 +144,8 @@ class NameMatcher(Matcher):
     """
 
     def __init__(self):
+        # TODO: shouldn't it be '\*\s*FROM\s+CLIP\s+NAME:(\s+)(.+)' as above,
+        #       add a test for this
         Matcher.__init__(self, '\*\s*FROM CLIP NAME:(\s+)(.+)')
 
     def apply(self, stack, line):
@@ -236,7 +252,7 @@ class EventMatcher(Matcher):
         return evt
 
 
-class Effect:
+class Effect(object):
     """No documentation for this class yet.
     """
 
@@ -276,7 +292,7 @@ class Key(Effect):
         Effect.__init__(self)
 
 
-class Timewarp:
+class Timewarp(object):
     """No documentation for this class yet.
     """
 
@@ -285,8 +301,8 @@ class Timewarp:
         self.reel = reel
         self.fps = fps
         self.warp_fps = float(warp_fps)
-        self.timecode = pytimecode.PyTimeCode(fps)
-        self.timecode.set_timecode(tc)
+        self.timecode = pytimecode.PyTimeCode(fps, tc)
+        # self.timecode.set_timecode(tc)
 
 
 class Event(object):
@@ -313,15 +329,18 @@ class Event(object):
         self.num = None
         self.tr_code = None
 
+        # TODO: This is absolutely wrong and not safe. Please validate the
+        #       incoming values, before adopting them as instance variables
+        #       and instance methods
         for o in options:
             self.__dict__[o] = options[o]
 
-    def __repr__(self):
-        v = ["(\n"]
-        for k in self.__dict__:
-            v.append("    %s=%s,\n" % (k, self.__dict__[k]))
-        v.append(")")
-        return ''.join(v)
+    # def __repr__(self):
+    #     v = ["(\n"]
+    #     for k in self.__dict__:
+    #         v.append("    %s=%s,\n" % (k, self.__dict__[k]))
+    #     v.append(")")
+    #     return ''.join(v)
 
     def to_string(self):
         """Human Readable string representation of edl event.
