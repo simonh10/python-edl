@@ -29,6 +29,7 @@ class List(object):
     def __init__(self, fps):
         self.events = []
         self.fps = fps
+        self.title = ''
 
     def __getitem__(self, i):
         """Returns each of the Events that this List holds.
@@ -75,25 +76,37 @@ class List(object):
         return self.events
 
     def without_transitions(self):
-        pass
+        raise NotImplementedError
 
     def renumbered(self):
-        pass
+        raise NotImplementedError
 
     def without_timewarps(self):
-        pass
+        raise NotImplementedError
 
     def without_generators(self):
-        pass
+        raise NotImplementedError
 
     def capture_list(self):
-        pass
+        raise NotImplementedError
 
     def from_zero(self):
-        pass
+        raise NotImplementedError
 
     def spliced(self):
-        pass
+        raise NotImplementedError
+
+    def to_string(self):
+        """The string output of the Events, this matches a standard EDL file
+        format. Using List.to_string() should return the edl back to its
+        original format.
+        """
+        # for each Event call their to_string() method and gather the output
+        output_buffer = ['TITLE: %s' % self.title, '']
+        for event in self.events:
+            output_buffer.append(event.to_string())
+            # output_buffer.append('')
+        return '\n'.join(output_buffer)
 
 
 class Matcher(object):
@@ -108,6 +121,20 @@ class Matcher(object):
 
     def apply(self, stack, line):
         sys.stderr.write("Skipping:" + line)
+
+
+class TitleMatcher(Matcher):
+    """Matches the EDL Title attribute
+    """
+    def __init__(self):
+        Matcher.__init__(self, 'TITLE: (.+)')
+
+    def apply(self, stack, line):
+        m = re.search(self.regex, line)
+        try:
+            stack.title = m.group(1).strip()
+        except (IndexError, AttributeError):
+            pass
 
 
 class CommentMatcher(Matcher):
@@ -181,7 +208,7 @@ class EffectMatcher(Matcher):
     def apply(self, stack, line):
         m = re.search(self.regex, line)
         if m:
-            stack[-1].transition.effect = m.group(1).strip()
+            stack[-1].transition.effect = m.group(2).strip()
 
 
 class TimewarpMatcher(Matcher):
@@ -197,8 +224,8 @@ class TimewarpMatcher(Matcher):
     def apply(self, stack, line):
         m = re.search(self.regexp, line)
         if m:
-            stack[-1].timewarp = Timewarp(m.group(1), m.group(2), m.group(3),
-                                          self.fps)
+            stack[-1].timewarp = \
+                Timewarp(m.group(1), m.group(2), m.group(3), self.fps)
             if float(m.group(2)) < 0:
                 stack[-1].timewarp.reverse = True
 
@@ -302,7 +329,15 @@ class Timewarp(object):
         self.fps = fps
         self.warp_fps = float(warp_fps)
         self.timecode = pytimecode.PyTimeCode(fps, tc)
-        # self.timecode.set_timecode(tc)
+
+    def to_string(self):
+        """the string representation of this Timewarp instance
+        """
+        return 'M2   %(reel)-8s %(warp_fps)s %(timecode)32s ' % {
+            'reel': self.reel,
+            'warp_fps': self.warp_fps,
+            'timecode': self.timecode
+        }
 
 
 class Event(object):
@@ -344,8 +379,39 @@ class Event(object):
 
     def to_string(self):
         """Human Readable string representation of edl event.
+
+        Returns the string representation of this Event which is suitable
+        to be written to a file to gather back the EDL itself.
         """
-        return self.__repr__()
+        effect = ''
+        if self.transition:
+            try:
+                effect = 'EFFECTS NAME IS %s\n' % self.transition.effect
+            except AttributeError:
+                pass
+
+        s = "%(num)-4s %(reel)-8s %(track)-5s %(tr_code)-4s %(aux)-3s " \
+            "%(src_start_tc)s %(src_end_tc)s %(rec_start_tc)s " \
+            "%(rec_end_tc)s\n" \
+            "%(effect)s" \
+            "%(notes)s" \
+            "%(timewarp)s" % {
+            'num': self.num,
+            'reel': self.reel,
+            'track': self.track,
+            'aux': self.aux,
+            'tr_code': self.tr_code,
+            'src_start_tc': self.src_start_tc,
+            'src_end_tc': self.src_end_tc,
+            'rec_start_tc': self.rec_start_tc,
+            'rec_end_tc': self.rec_end_tc,
+            'effect': effect,
+            'notes': '%s\n' % '\n'.join(self.comments)
+                if self.comments else '',
+            'timewarp': '%s\n' % self.timewarp.to_string()
+                if self.has_timewarp() else ''}
+
+        return s
 
     def to_inspect(self):
         """Human Readable string representation of edl event.
@@ -475,9 +541,9 @@ class Parser(object):
         self.fps = fps
 
     def get_matchers(self):
-        return [EventMatcher(self.fps), EffectMatcher(), NameMatcher(),
-                SourceMatcher(),
-                TimewarpMatcher(self.fps), CommentMatcher()]
+        return [TitleMatcher(), EventMatcher(self.fps), EffectMatcher(),
+                NameMatcher(), SourceMatcher(), TimewarpMatcher(self.fps),
+                CommentMatcher()]
 
     def parse(self, input_):
         stack = None
