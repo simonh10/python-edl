@@ -2,7 +2,7 @@
 
 import unittest
 import re
-from edl.edl import TitleMatcher, List
+from edl import TitleMatcher, List
 
 
 class TitleMatcherTestCase(unittest.TestCase):

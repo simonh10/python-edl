@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from edl.edl import Timewarp
+from edl import Timewarp
 
 
 class TimeWarpTestCase(unittest.TestCase):

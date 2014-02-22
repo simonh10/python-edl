@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from edl import edl
+import edl
 
 
 class ListTestCase(unittest.TestCase):

@@ -2,7 +2,7 @@
 
 import unittest
 import re
-from edl.edl import EffectMatcher, List, Event, Effect
+from edl import EffectMatcher, List, Event, Effect
 
 
 class EffectMatcherTestCase(unittest.TestCase):
