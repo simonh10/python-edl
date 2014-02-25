@@ -397,11 +397,11 @@ class Event(object):
             "%(effect)s" \
             "%(notes)s" \
             "%(timewarp)s" % {
-            'num': self.num,
-            'reel': self.reel,
-            'track': self.track,
-            'aux': self.aux,
-            'tr_code': self.tr_code,
+            'num': self.num if self.num else '',
+            'reel': self.reel if self.reel else '',
+            'track': self.track if self.track else '',
+            'aux': self.aux if self.aux else '',
+            'tr_code': self.tr_code if self.tr_code else '',
             'src_start_tc': self.src_start_tc,
             'src_end_tc': self.src_end_tc,
             'rec_start_tc': self.rec_start_tc,
