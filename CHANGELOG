@@ -6,9 +6,9 @@ Changes
 =====
 
 * **New:** Added ``List.to_string()`` method to get a string representation of
-  the EDL, which outputs a string matching a regular EDL file content (the
-  audio track information is still not put in to this string so it needs more
-  work, the test is failing).
+  the EDL, which outputs a string matching a regular EDL (File 32) file content
+  (the audio track information is still not put in to this string so it needs
+  more work, the tests are failing).
 
 * **New:** Added ``TitleMatcher`` class to match against "TITLE" value, also
   added tests for this class.
@@ -19,11 +19,11 @@ Changes
 * **New:** Added tests for the ``EffectMatcher.apply()`` method and
   ``EffectMatcher.regex`` attribute value.
 
-* **New:** Added ``TimeWarp.to_string()`` which outputs an EDL compatible
-  string representation of the ``Timewarp`` object.
+* **New:** Added ``TimeWarp.to_string()`` which outputs a EDL (File 32)
+  compatible string representation of the ``Timewarp`` object.
 
-* **New:** Added ``Event.to_string()`` which outputs an EDL compatible string
-  representation of the ``Event`` object.
+* **New:** Added ``Event.to_string()`` which outputs a EDL (File 32) compatible
+  string representation of the ``Event`` object.
 
 * **Update:** Edited tests to reflect changes in version 0.2.0 of 
   ``pythontimecode`` library.
