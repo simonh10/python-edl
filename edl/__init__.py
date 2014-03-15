@@ -391,7 +391,7 @@ class Event(object):
             except AttributeError:
                 pass
 
-        s = "%(num)-6s %(reel)-28s %(track)-5s %(tr_code)-5s %(aux)-6s " \
+        s = "%(num)-6s %(reel)-32s %(track)-5s %(tr_code)-3s %(aux)-4s " \
             "%(src_start_tc)s %(src_end_tc)s %(rec_start_tc)s " \
             "%(rec_end_tc)s\n" \
             "%(effect)s" \
