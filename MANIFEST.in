@@ -1,2 +1,10 @@
+include *.txt *.ini *.cfg *.rst
 include CHANGES
 include LICENSE
+include README
+include MANIFEST.in
+recursive-include docs *
+recursive-include tests *
+
+prune docs/build
+prune docs/source/generated

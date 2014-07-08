@@ -4,7 +4,7 @@ Module EDL
 unit test suite
 """
 
-from edl import edl
+import edl
 import unittest
 
 
@@ -23,13 +23,11 @@ class ParserTestCase(unittest.TestCase):
                          'Wrong source frame length')
         self.assertEqual(s.events[0].rec_length(), 1440,
                          'Wrong record frame length')
-        self.assertEqual(s.events[0].src_start_tc.frames, 86400,
-                         'Wrong source start timecode')
-        self.assertEqual(s.events[0].src_end_tc.frames, 87840,
+        self.assertEqual(s.events[0].src_end_tc.frame_number, 87840,
                          'Wrong source end timecode')
-        self.assertEqual(s.events[0].rec_start_tc.frames, 0,
+        self.assertEqual(s.events[0].rec_start_tc.frame_number, 0,
                          'Wrong record start timecode')
-        self.assertEqual(s.events[0].rec_end_tc.frames, 1440,
+        self.assertEqual(s.events[0].rec_end_tc.frame_number, 1440,
                          'Wrong record end timecode')
         self.assertEqual(s.events[1].clip_name, 'clip #2',
                          'Failed clip name test char 2')
@@ -39,13 +37,13 @@ class ParserTestCase(unittest.TestCase):
                          'Failed clip name test char 4')
         self.assertEqual(s.events[4].clip_name, 'clip &5',
                          'Failed clip name test char 5')
-        self.assertEqual(s.events[5].src_start_tc.frames, 697,
+        self.assertEqual(s.events[5].src_start_tc.frame_number, 697,
                          "Wrong Source start complex event")
-        self.assertEqual(s.events[5].src_end_tc.frames, 697,
+        self.assertEqual(s.events[5].src_end_tc.frame_number, 697,
                          "Wrong Source end complex event")
-        self.assertEqual(s.events[5].rec_start_tc.frames, 2857,
+        self.assertEqual(s.events[5].rec_start_tc.frame_number, 2857,
                          "Wrong Source start complex event")
-        self.assertEqual(s.events[5].rec_end_tc.frames, 2857,
+        self.assertEqual(s.events[5].rec_end_tc.frame_number, 2857,
                          "Wrong Source end complex event")
 
     def test_pal(self):

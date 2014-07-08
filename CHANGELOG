@@ -1,0 +1,58 @@
+=======
+Changes
+=======
+
+0.1.10
+======
+
+* **Update:** Updated the ``setup.py`` to include required ``timecode``
+  library.
+* **Update:** Now using the ``timecode`` library (which is a fork of the
+  unmaintained ``PyTimeCode``).
+
+0.1.9
+=====
+
+* **New:** Added ``List.to_string()`` method to get a string representation of
+  the EDL, which outputs a string matching a regular EDL (File 32) file content
+  (the audio track information is still not put in to this string so it needs
+  more work, the tests are failing).
+
+* **New:** Added ``TitleMatcher`` class to match against "TITLE" value, also
+  added tests for this class.
+
+* **Fix:** Fixed ``EffectMatcher``, it is now successfully matching the effect
+  value.
+
+* **New:** Added tests for the ``EffectMatcher.apply()`` method and
+  ``EffectMatcher.regex`` attribute value.
+
+* **New:** Added ``TimeWarp.to_string()`` which outputs a EDL (File 32)
+  compatible string representation of the ``Timewarp`` object.
+
+* **New:** Added ``Event.to_string()`` which outputs a EDL (File 32) compatible
+  string representation of the ``Event`` object.
+
+* **Update:** Edited tests to reflect changes in version 0.2.0 of 
+  ``pythontimecode`` library.
+
+* **Update:** Moved the ``edl.py`` file to ``edl/__init__.py`` to fix the
+  quirky library usage. So with this change instead of::
+
+    from edl import edl
+    p = edl.Parser('24')
+
+  You can use::
+
+    import edl
+    p = edl.Parser('24')
+
+  or::
+
+    from edl import Parser
+    p = Parser('24')
+
+0.1, 11/06/2013
+===============
+
+* Initial release
