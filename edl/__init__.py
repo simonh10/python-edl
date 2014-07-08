@@ -6,9 +6,9 @@ import sys
 import collections
 import re
 import pprint
-import pytimecode
+import timecode
 
-__version__ = '0.1.9'
+__version__ = '0.1.10'
 
 
 class List(object):
@@ -270,12 +270,10 @@ class EventMatcher(Matcher):
                 evt.transition = Key()
             else:
                 evt.transition = None
-            evt.src_start_tc = pytimecode.PyTimeCode(self.fps,
-                                                     evt.src_start_tc)
-            evt.src_end_tc = pytimecode.PyTimeCode(self.fps, evt.src_end_tc)
-            evt.rec_start_tc = pytimecode.PyTimeCode(self.fps,
-                                                     evt.rec_start_tc)
-            evt.rec_end_tc = pytimecode.PyTimeCode(self.fps, evt.rec_end_tc)
+            evt.src_start_tc = timecode.Timecode(self.fps, evt.src_start_tc)
+            evt.src_end_tc = timecode.Timecode(self.fps, evt.src_end_tc)
+            evt.rec_start_tc = timecode.Timecode(self.fps, evt.rec_start_tc)
+            evt.rec_end_tc = timecode.Timecode(self.fps, evt.rec_end_tc)
             stack.append(evt)
         return evt
 
@@ -329,7 +327,7 @@ class Timewarp(object):
         self.reel = reel
         self.fps = fps
         self.warp_fps = float(warp_fps)
-        self.timecode = pytimecode.PyTimeCode(fps, tc)
+        self.timecode = timecode.Timecode(fps, tc)
 
     def to_string(self):
         """the string representation of this Timewarp instance

@@ -29,6 +29,8 @@ class ListTestCase(unittest.TestCase):
         with open('../tests/test_data/test_24.edl') as f:
             expected_edl = f.readlines()
 
+        self.maxDiff = None
+
         self.assertEqual(
             ''.join(expected_edl),
             s.to_string()

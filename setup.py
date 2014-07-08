@@ -3,6 +3,10 @@
 from distutils.core import setup
 import edl
 
+requires = [
+    'timecode'
+]
+
 setup(
     name='edl',
     version=edl.__version__,
@@ -23,5 +27,6 @@ setup(
        'Natural Language :: English',
        'Topic :: Multimedia :: Video',
        'Topic :: Software Development :: Libraries'
-    ]
+    ],
+    install_requires=requires,
 )
