@@ -532,12 +532,13 @@ class Parser(object):
     """No documentation for this class yet.
     """
 
-    default_fps = 25.0
+    default_fps = "25.0"
 
-    def __init__(self, fps):
+    def __init__(self, fps=None):
         if fps is None:
             self.fps = self.default_fps
-        self.fps = fps
+        else:
+            self.fps = fps
 
     def get_matchers(self):
         return [TitleMatcher(), EventMatcher(self.fps), EffectMatcher(),
