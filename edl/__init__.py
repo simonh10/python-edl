@@ -8,7 +8,7 @@ import re
 import pprint
 import timecode
 
-__version__ = '0.1.10'
+__version__ = '0.1.11'
 
 
 class List(object):
