@@ -31,6 +31,7 @@ class List(object):
         self.events = []
         self.fps = fps
         self.title = ''
+        self.fcm = None
 
     def __getitem__(self, i):
         """Returns each of the Events that this List holds.
@@ -103,11 +104,11 @@ class List(object):
         original format.
         """
         # for each Event call their to_string() method and gather the output
-        output_buffer = ['TITLE: %s' % self.title, '']
+        output_buffer = ['TITLE: %s' % self.title, '\n']
         for event in self.events:
             output_buffer.append(event.to_string())
             # output_buffer.append('')
-        return '\n'.join(output_buffer)
+        return ''.join(output_buffer)
 
 
 class Matcher(object):
@@ -123,6 +124,18 @@ class Matcher(object):
     def apply(self, stack, line):
         sys.stderr.write("Skipping:" + line)
 
+class FCMMatcher(Matcher):
+    """Matches the FCM attribute
+    """
+    def __init__(self):
+        Matcher.__init__(self, 'FCM: (.+)')
+
+    def apply(self, stack, line):
+        m = re.search(self.regex, line)
+        try:
+            stack.fcm = m.group(1).strip()
+        except (IndexError, AttributeError):
+            pass
 
 class TitleMatcher(Matcher):
     """Matches the EDL Title attribute
@@ -543,7 +556,7 @@ class Parser(object):
     def get_matchers(self):
         return [TitleMatcher(), EventMatcher(self.fps), EffectMatcher(),
                 NameMatcher(), SourceMatcher(), TimewarpMatcher(self.fps),
-                CommentMatcher()]
+                CommentMatcher(), FCMMatcher()]
 
     def parse(self, input_):
         stack = None
