@@ -105,6 +105,8 @@ class List(object):
         """
         # for each Event call their to_string() method and gather the output
         output_buffer = ['TITLE: %s' % self.title, '\n']
+        if self.fcm:
+            output_buffer.append('FCM: %s\n' % self.fcm)
         for event in self.events:
             output_buffer.append(event.to_string())
             # output_buffer.append('')
