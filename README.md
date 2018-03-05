@@ -12,7 +12,7 @@ https://github.com/simonh10/python-edl
 
 Usage::
 
-    from edl.edl import Parser
+    from edl import Parser
     parser=Parser('23.98')
     with open('file.edl') as f:
         edl=parser.parse(f)
