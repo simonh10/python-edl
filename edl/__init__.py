@@ -8,7 +8,7 @@ import re
 import pprint
 import timecode
 
-__version__ = '0.1.11'
+from .version import __version__
 
 
 class List(object):
@@ -126,6 +126,7 @@ class Matcher(object):
     def apply(self, stack, line):
         sys.stderr.write("Skipping:" + line)
 
+
 class FCMMatcher(Matcher):
     """Matches the FCM attribute
     """
@@ -138,6 +139,7 @@ class FCMMatcher(Matcher):
             stack.fcm = m.group(1).strip()
         except (IndexError, AttributeError):
             pass
+
 
 class TitleMatcher(Matcher):
     """Matches the EDL Title attribute
@@ -198,7 +200,26 @@ class NameMatcher(Matcher):
             if m:
                 stack[-1].clip_name = m.group(2).strip()
 
+class ToNameMatcher(Matcher):
+    """
+    Identifies TO CLIP NAME as the destination clip for the transition.
+    Pushes FROM CLIP NAME value to the previous entry (the source).
+    """
 
+    def __init__(self):
+        # Following similar convention to NameMatcher, finds destination name
+        Matcher.__init__(self, '\*\s*TO CLIP NAME:(\s+)(.+)')
+
+    def apply(self, stack, line):
+        m = re.search(self.regex, line)
+        #print line
+        if len(stack) > 0:
+            if m:
+                # this "From" is the name from previous Clip
+                stack[-2].clip_name = stack[-1].clip_name
+                # this "To" is the name we want to keep for this event
+                stack[-1].clip_name = m.group(2).strip()
+                
 class SourceMatcher(Matcher):
     """No documentation for this class yet.
     """
@@ -219,7 +240,13 @@ class EffectMatcher(Matcher):
     """
 
     def __init__(self):
-        Matcher.__init__(self, 'EFFECTS NAME IS(\s+)(.+)')
+        """
+        Matches
+        * EFFECT NAME: CROSS DISSOLVE     (Toon boom Storyboard Pro Edl)
+        or
+        EFFECTS NAME IS CROSS DISSOLVE    (Adobe Premiere Edl)
+        """
+        Matcher.__init__(self, '.*EFFECT.*(?:IS|:)(\s+)(.+)')
 
     def apply(self, stack, line):
         m = re.search(self.regex, line)
@@ -273,9 +300,11 @@ class EventMatcher(Matcher):
             values = map(self.stripper, matches)
             evt = Event(dict(zip(keys, values)))
             t = evt.tr_code
-            if t == 'C':
-                if len(stack) > 0:
+
+            if len(stack) > 0:
                     stack[-1].next_event = evt
+
+            if t == 'C':
                 evt.transition = Cut()
             elif t == 'D':
                 evt.transition = Dissolve()
@@ -557,8 +586,8 @@ class Parser(object):
 
     def get_matchers(self):
         return [TitleMatcher(), EventMatcher(self.fps), EffectMatcher(),
-                NameMatcher(), SourceMatcher(), TimewarpMatcher(self.fps),
-                CommentMatcher(), FCMMatcher()]
+                NameMatcher(), ToNameMatcher(), SourceMatcher(), 
+                TimewarpMatcher(self.fps), CommentMatcher()]
 
     def parse(self, input_):
         stack = None

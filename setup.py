@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
-import edl
+exec(open('edl/version.py').read())
 
 requires = [
     'timecode'
@@ -9,7 +9,7 @@ requires = [
 
 setup(
     name='edl',
-    version=edl.__version__,
+    version=__version__,
     description='Simple EDL reading library',
     author='Simon Hargreaves',
     author_email='simon@simon-hargreaves.com',
